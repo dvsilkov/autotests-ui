@@ -1,9 +1,9 @@
 import pytest
-from playwright.sync_api import Page, expect
+from playwright.sync_api import expect, Page
 
 @pytest.mark.regression
 @pytest.mark.registration
-def test_successful_registration(chromium_page):  # Создаем тестовую функцию
+def test_successful_registration(chromium_page: Page):  # Создаем тестовую функцию
     chromium_page.goto('https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration')
 
     email_input = chromium_page.get_by_test_id('registration-form-email-input').locator('input')
