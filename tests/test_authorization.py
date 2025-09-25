@@ -1,5 +1,5 @@
 import pytest
-from playwright.sync_api import expect, Page
+from pages.login_page import LoginPage # Импортируем LoginPage
 
 @pytest.mark.regression
 @pytest.mark.authorization
@@ -10,22 +10,18 @@ from playwright.sync_api import expect, Page
 ])
 
 # Создаем тестовую функцию с параметрами
-def test_wrong_email_or_password_authorization(chromium_page: Page, email: str, password: str):
-    chromium_page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/login")
+def test_wrong_email_or_password_authorization(login_page: LoginPage, email: str, password: str):
+    """ Проверка неуспешной авторизации """
+    # с помощью метода visit, наследуемого от BasePage, открываем страницу авторизации
+    login_page.visit("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/login")
 
-    email_input = chromium_page.get_by_test_id('login-form-email-input').locator('input')
-    email_input.fill(email)
+    # Используем метод fill_login_form для заполнения полей логина и пароля
+    login_page.fill_login_form(email=email, password=password)
 
-    password_input = chromium_page.get_by_test_id('login-form-password-input').locator('input')
-    password_input.fill(password)
+    # Метод click_login_button позволит нам нажать на кнопку "Login"
+    login_page.click_login_button()
 
-    login_button = chromium_page.get_by_test_id('login-page-login-button')
-    login_button.click()
-
-    wrong_email_or_password_alert = chromium_page.get_by_test_id('login-page-wrong-email-or-password-alert')
-    expect(wrong_email_or_password_alert).to_be_visible()
-    expect(wrong_email_or_password_alert).to_have_text("Wrong email or password")
-
-    chromium_page.wait_for_timeout(1000)
+    # Для проверки сообщения об ошибке используем метод check_visible_wrong_email_or_password_alert
+    login_page.check_visible_wrong_email_or_password_alert()
 
 # команда для запуска python -m pytest -k "test_wrong_email_or_password_authorization" -s -v

@@ -1,4 +1,5 @@
 # conftest
 pytest_plugins = (
-    "fixtures.browsers"
+    "fixtures.browsers", # Подключаем фикстуры для работы с браузером
+    "fixtures.pages" # Подключаем фикстуры страниц
 )

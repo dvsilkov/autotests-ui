@@ -15,6 +15,7 @@ def chromium_page(playwright: Playwright) -> Page:  # Аннотируем во�
     yield page
 
     # Закрываем страницу, контекст и браузер после выполнения тестов
+    page.wait_for_timeout(1000)
     page.close()
     context.close()
     browser.close()
