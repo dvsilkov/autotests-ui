@@ -4,6 +4,7 @@ from pages.dashboard_page import DashboardPage # Импортируем клас
 
 @pytest.mark.regression
 @pytest.mark.registration
+# в аргументах метода указываем фикстуры registration_page и dashboard_page, которые инициализируют страницы
 def test_successful_registration(registration_page: RegistrationPage, dashboard_page: DashboardPage):
     """ Проверка успешной регистрации """
     registration_page.visit('https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration')
