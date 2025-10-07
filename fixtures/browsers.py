@@ -21,7 +21,7 @@ def chromium_page(playwright: Playwright) -> Page:  # Аннотируем во�
     browser.close()
 
 # фикстура регистрирует нового пользователя и сохраняет состояние браузера для последующего использования
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def initialize_browser_state(playwright: Playwright):
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()

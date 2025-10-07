@@ -3,7 +3,7 @@ from playwright.sync_api import sync_playwright, expect
 
 @pytest.mark.courses
 @pytest.mark.regression
-def test_empty_courses_list():
+def test_no_fixture_empty_courses_list():
     # Открываем браузер с использованием Playwright
     with sync_playwright() as pw:
         # Запускаем Chromium браузер в обычном режиме (не headless)

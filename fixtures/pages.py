@@ -26,6 +26,12 @@ def dashboard_page(chromium_page: Page) -> DashboardPage:
 
 @pytest.fixture
 # в качестве аргумента фикстура chromium_page_with_state, позволяет сразу открывать нужную страницу, без авторизации
+def dashboard_page_with_state(chromium_page_with_state: Page) -> DashboardPage:
+    """ Фикстура для инициализации страницы DashboardPage минуя этап авторизации, возвращает экземпляр класса"""
+    return DashboardPage(page=chromium_page_with_state)
+
+@pytest.fixture
+# в качестве аргумента фикстура chromium_page_with_state, позволяет сразу открывать нужную страницу, без авторизации
 def courses_list_page(chromium_page_with_state: Page) -> CoursesListPage:
     """ Фикстура для инициализации страницы CoursesListPage, возвращает экземпляр класса"""
     return CoursesListPage(page=chromium_page_with_state)
