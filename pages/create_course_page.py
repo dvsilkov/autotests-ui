@@ -1,4 +1,8 @@
 from playwright.sync_api import Page, expect
+
+from components.courses.create_course_exercise_form_component import CreateCourseExerciseFormComponent
+from components.views.empty_view_component import EmptyViewComponent
+from components.views.image_upload_widget_component import ImageUploadWidgetComponent
 from pages.base_page import BasePage
 
 class CreateCoursePage(BasePage):
@@ -6,31 +10,19 @@ class CreateCoursePage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
 
+        # Компонент, включающий в себя виджет по загрузке изображения. Вместо локаторов реализован как PageComponent
+        # Компонент ImageUploadWidgetComponent также включает в себя компонент EmptyViewComponent
+        self.image_upload_widget = ImageUploadWidgetComponent(page, 'create-course-preview')
+
+        # Блок, который отображается, когда в курсе нет заданий. Вместо локаторов реализован как PageComponent
+        self.exercises_empty_view = EmptyViewComponent(page, 'create-course-exercises')
+
+        # Компонент - форма для создания и редактирования заданий. Вместо локаторов реализован как PageComponent
+        self.create_exercise_form = CreateCourseExerciseFormComponent(page)
+
         # Заголовок и кнопка создания курса
         self.create_course_title = page.get_by_test_id('create-course-toolbar-title-text')
         self.create_course_button = page.get_by_test_id('create-course-toolbar-create-course-button')
-
-        # Картинка предпросмотра и блок предпросмотра картинки курса
-        self.preview_image = page.get_by_test_id('create-course-preview-image-upload-widget-preview-image')
-        self.preview_empty_view_icon = page.get_by_test_id('create-course-preview-empty-view-icon')
-        self.preview_empty_view_title = page.get_by_test_id('create-course-preview-empty-view-title-text')
-        self.preview_empty_view_description = page.get_by_test_id('create-course-preview-empty-view-description-text')
-
-        # Кнопка загрузки, удаления картинки предпросмотра курса и блок с информацией о загружаемой картинке
-        self.preview_image_upload_icon = page.get_by_test_id('create-course-preview-image-upload-widget-info-icon')
-        self.preview_image_upload_title = page.get_by_test_id(
-            'create-course-preview-image-upload-widget-info-title-text'
-        )
-        self.preview_image_upload_description = page.get_by_test_id(
-            'create-course-preview-image-upload-widget-info-description-text'
-        )
-        self.preview_image_upload_button = page.get_by_test_id(
-            'create-course-preview-image-upload-widget-upload-button'
-        )
-        self.preview_image_remove_button = page.get_by_test_id(
-            'create-course-preview-image-upload-widget-remove-button'
-        )
-        self.preview_image_upload_input = page.get_by_test_id('create-course-preview-image-upload-widget-input')
 
         # Форма создания курса
         self.create_course_title_input = page.get_by_test_id('create-course-form-title-input').locator('input')
@@ -47,13 +39,6 @@ class CreateCoursePage(BasePage):
         # Заголовок и кнопка создания задания
         self.exercises_title = page.get_by_test_id('create-course-exercises-box-toolbar-title-text')
         self.create_exercise_button = page.get_by_test_id('create-course-exercises-box-toolbar-create-exercise-button')
-
-        # Блок, который отображется, когда в курсе нет заданий
-        self.exercises_empty_view_icon = page.get_by_test_id('create-course-exercises-empty-view-icon')
-        self.exercises_empty_view_title = page.get_by_test_id('create-course-exercises-empty-view-title-text')
-        self.exercises_empty_view_description = page.get_by_test_id(
-            'create-course-exercises-empty-view-description-text'
-        )
 
     # Методы для работы с заголовком и кнопкой создания курса:
     def check_visible_create_course_title(self):
@@ -72,48 +57,6 @@ class CreateCoursePage(BasePage):
     def check_disabled_create_course_button(self):
         """проверяет, что кнопка создания курса неактивна """
         expect(self.create_course_button).to_be_disabled()
-
-    # Методы для работы с изображениями:
-    def check_visible_image_preview_empty_view(self):
-        """проверяет, что отображается пустой блок для превью изображения """
-        expect(self.preview_empty_view_icon).to_be_visible()
-
-        expect(self.preview_empty_view_title).to_be_visible()
-        expect(self.preview_empty_view_title).to_have_text('No image selected')
-
-        expect(self.preview_empty_view_description).to_be_visible()
-        expect(self.preview_empty_view_description).to_have_text(
-            'Preview of selected image will be displayed here'
-        )
-
-    def check_visible_image_upload_view(self, is_image_uploaded: bool = False):
-        """проверяет информацию о картинке. Если is_image_uploaded = True, проверяет кнопку 'Remove image' """
-        expect(self.preview_image_upload_icon).to_be_visible()
-
-        expect(self.preview_image_upload_title).to_be_visible()
-        expect(self.preview_image_upload_title).to_have_text(
-            'Tap on "Upload image" button to select file'
-        )
-
-        expect(self.preview_image_upload_description).to_be_visible()
-        expect(self.preview_image_upload_description).to_have_text('Recommended file size 540X300')
-
-        expect(self.preview_image_upload_button).to_be_visible()
-
-        if is_image_uploaded:
-            expect(self.preview_image_remove_button).to_be_visible()
-
-    def click_remove_image_button(self):
-        """нажимает кнопку 'Remove image' """
-        self.preview_image_remove_button.click()
-
-    def check_visible_preview_image(self):
-        """проверяет, что изображение курса отображается """
-        expect(self.preview_image).to_be_visible()
-
-    def upload_preview_image(self, file: str):
-        """загружает изображение курса """
-        self.preview_image_upload_input.set_input_files(file)
 
     # Методы для работы с формой создания курса:
     def check_visible_create_course_form(
@@ -179,63 +122,11 @@ class CreateCoursePage(BasePage):
         self.create_exercise_button.click()
 
     def check_visible_exercises_empty_view(self):
-        """проверяет, что отображается пустой блок для заданий """
-        expect(self.exercises_empty_view_icon).to_be_visible()
-
-        expect(self.exercises_empty_view_title).to_be_visible()
-        expect(self.exercises_empty_view_title).to_have_text('There is no exercises')
-
-        expect(self.exercises_empty_view_description).to_be_visible()
-        expect(self.exercises_empty_view_description).to_have_text(
-            'Click on "Create exercise" button to create new exercise'
+        """
+        проверяет, что отображается пустой блок для заданий, когда нет заданий в курсе
+        метод реализован через PageComponent
+        """
+        self.exercises_empty_view.check_visible(
+            title='There is no exercises',
+            description='Click on "Create exercise" button to create new exercise'
         )
-
-    # Методы для работы с добавленными упражнениями:
-    def click_delete_exercise_button(self, index: int):
-        """удаляет упражнение по его индексу """
-        # Обратите внимание, что локатор инициализируется непосредственно в методе.
-        # Это временное решение, так как с классическим подходом POM сложно работать с динамическими локаторами.
-        # В текущей реализации мы не можем заранее объявить локатор на уровне класса, поскольку его значение
-        # зависит от переданного индекса.
-        # В дальнейшем мы будем использовать паттерн PageFactory для более удобной обработки таких случаев
-        # и динамических элементов на странице.
-        delete_exercise_button = self.page.get_by_test_id(
-            f"create-course-exercise-{index}-box-toolbar-delete-exercise-button"
-        )
-        delete_exercise_button.click()
-
-    def check_visible_create_exercise_form(self, index: int, title: str, description: str):
-        """проверяет форму редактирования упражнения по индексу """
-        exercise_subtitle = self.page.get_by_test_id(
-            f"create-course-exercise-{index}-box-toolbar-subtitle-text"
-        )
-        exercise_title_input = self.page.get_by_test_id(
-            f"create-course-exercise-form-title-{index}-input"
-        )
-        exercise_description_input = self.page.get_by_test_id(
-            f"create-course-exercise-form-description-{index}-input"
-        )
-
-        expect(exercise_subtitle).to_be_visible()
-        expect(exercise_subtitle).to_have_text(f"#{index + 1} Exercise")
-
-        expect(exercise_title_input).to_be_visible()
-        expect(exercise_title_input).to_have_value(title)
-
-        expect(exercise_description_input).to_be_visible()
-        expect(exercise_description_input).to_have_value(description)
-
-    def fill_create_exercise_form(self, index: int, title: str, description: str):
-        """заполняет форму редактирования упражнения """
-        exercise_title_input = self.page.get_by_test_id(
-            f"create-course-exercise-form-title-{index}-input"
-        )
-        exercise_description_input = self.page.get_by_test_id(
-            f"create-course-exercise-form-description-{index}-input"
-        )
-
-        exercise_title_input.fill(title)
-        expect(exercise_title_input).to_have_value(title)
-
-        exercise_description_input.fill(description)
-        expect(exercise_description_input).to_have_value(description)
